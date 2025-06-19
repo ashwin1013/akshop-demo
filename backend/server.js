@@ -1,11 +1,23 @@
+
 import express from 'express'
 
 import doetenv from 'dotenv';
 doetenv.config();
 
-import products from './data/products.js';
+import connectDB from './config/db.js'
+
+import { notFound,errorHandler } from './middleware/errorMiddleware.js';
+
+import productRoutes from './routes/productRoutes.js'
+
+
 
 const port = process.env.PORT || 5000;
+
+
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 
@@ -14,17 +26,12 @@ app.get('/', (req,res)=>{
 
 });
 
-app.get ('/api/products',(req,res)=>{
-    res.json(products)
-})
+app.use('/api/products', productRoutes)
 
-app.get('/api/products/:id',(req,res)=>{
+app.use(notFound);
+app.use(errorHandler);
 
-    const product = products.find((p)=> p._id === req.params.id)
 
-    res.json(product)
-
-})
 
 app.listen(port,()=>{
     console.log(`Server is Running on port ${port}`)
